@@ -30,20 +30,6 @@ export default function InputForm() {
 
   useEffect(() => {
     if (formRef.current) {
-      const formData = new FormData(formRef.current);
-      formData.set('from-input', 'acre');
-      calculateAction(formData);
-    }
-  }, [acre, calculateAction]);
-
-  useEffect(() => {
-    if (formState.message) {
-      toast(formState.message);
-    }
-  }, [formState.message]);
-
-  useEffect(() => {
-    if (formRef.current) {
       for (const element of formRef.current.getElementsByTagName('input')) {
         if (element instanceof HTMLInputElement) {
           const value = formState.formData.get(element.id);
@@ -52,6 +38,9 @@ export default function InputForm() {
           }
         }
       }
+    }
+    if (formState.message !== '') {
+      toast(formState.message);
     }
   }, [formState]);
 
@@ -90,7 +79,14 @@ export default function InputForm() {
                   name={key}
                   disabled={pending}
                   checked={acre}
-                  onCheckedChange={() => setAcre(!acre)}
+                  onCheckedChange={(prevState) => {
+                    if (formRef.current) {
+                      const formData = new FormData(formRef.current);
+                      formData.set('from-input', 'acre');
+                      calculateAction(formData);
+                    }
+                    setAcre(!prevState);
+                  }}
                 />
               ) : (
                 <Input
