@@ -81,14 +81,15 @@ export default function InputForm() {
                   name={key}
                   disabled={pending}
                   checked={acre}
-                  onCheckedChange={(prevState) => {
+                  onCheckedChange={(newState) => {
                     if (formRef.current) {
+                      setAcre(newState);
                       const formData = new FormData(formRef.current);
                       formData.set('from-input', 'acre');
+                      formData.set('acre', newState ? 'on' : 'off');
                       calculateAction(formData);
                       setPending(true);
                     }
-                    setAcre(prevState);
                   }}
                 />
               ) : (
