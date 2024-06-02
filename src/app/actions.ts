@@ -71,10 +71,10 @@ export async function calculate(
   }
 
   const newFormData = new FormData();
-  setFormDataValue(newFormData, 'cout_employeur', salaireBrut * 1.051);
+  setFormDataValue(newFormData, 'cout_employeur', salaireBrut * 1.656);
   setFormDataValue(newFormData, 'salaire_brut', salaireBrut);
-  setFormDataValue(newFormData, 'salaire_net', salaireBrut * 0.73);
-  setFormDataValue(newFormData, 'salaire_net_apres_impot', salaireBrut * 0.77);
+  setFormDataValue(newFormData, 'salaire_net', salaireBrut * 0.952);
+  setFormDataValue(newFormData, 'salaire_net_apres_impot', salaireBrut * 0.895);
 
   let coutPrestation = parseInt(
     (formData.get('cout_prestation') ?? '0').toString()

@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Quicksand as FontSans } from 'next/font/google';
 import './globals.css';
 import { cn } from '@/lib/utils';
+import { Toaster } from '@/components/ui/sonner';
 
 const fontSans = FontSans({
   subsets: ['latin'],
@@ -34,6 +35,7 @@ export default function RootLayout({
           </div>
         </header>
         {children}
+        <Toaster />
       </body>
     </html>
   );
