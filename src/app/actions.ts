@@ -1,6 +1,6 @@
 'use server';
 
-import { salariesFields, autoEntrepreneurFields } from '@/app/page';
+import { salariesFields, autoEntrepreneurFields } from '@/app/fields';
 
 function setFormDataValue(
   formData: FormData,

@@ -6,7 +6,7 @@ import { Label } from './ui/label';
 import { Switch } from './ui/switch';
 import { calculate } from '@/app/actions';
 import { useFormStatus } from 'react-dom';
-import { salariesFieldsInfos, autoEntrepreneurFieldsInfos } from '@/app/page';
+import { salariesFieldsInfos, autoEntrepreneurFieldsInfos } from '@/app/fields';
 
 const initialState = {
   message: '',
