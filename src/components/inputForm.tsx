@@ -17,11 +17,12 @@ const initialState = {
 export default function InputForm() {
   const formRef = useRef<HTMLFormElement>(null);
   const [formState, calculateAction] = useActionState(calculate, initialState);
-  const { pending } = useFormStatus();
+  const [pending, setPending] = useState(false);
   const [acre, setAcre] = useState<boolean>(true);
 
   function handleInputChange(event: React.ChangeEvent<HTMLInputElement>) {
     if (formRef.current) {
+      setPending(true);
       const formData = new FormData(formRef.current);
       formData.set('from-input', event.target.name);
       calculateAction(formData);
@@ -34,7 +35,7 @@ export default function InputForm() {
         if (element instanceof HTMLInputElement) {
           const value = formState.formData.get(element.id);
           if (typeof value === 'string') {
-            element.value = value;
+            element.value = parseInt(value).toString();
           }
         }
       }
@@ -42,6 +43,7 @@ export default function InputForm() {
     if (formState.message !== '') {
       toast(formState.message);
     }
+    setPending(false);
   }, [formState]);
 
   return (
@@ -51,9 +53,9 @@ export default function InputForm() {
     >
       <div className='flex flex-col gap-4 sm:gap-8'>
         <h2 className='text-xl text-primary font-bold'>Employé</h2>
-        <div className='grid grid-cols-2 gap-4 items-center'>
+        <div className='flex flex-col gap-4'>
           {Object.entries(salariesFieldsInfos).map(([key, label]) => (
-            <>
+            <div key={key} className='grid grid-cols-2 gap-4 items-center'>
               <Label htmlFor={key}>{label}</Label>
               <Input
                 id={key}
@@ -63,15 +65,15 @@ export default function InputForm() {
                 disabled={pending}
                 defaultValue={0}
               />
-            </>
+            </div>
           ))}
         </div>
       </div>
       <div className='flex flex-col gap-4 sm:gap-8'>
         <h2 className='text-xl text-primary font-bold'>Auto-entrepreneur</h2>
-        <div className='grid grid-cols-2 grid-rows-4 gap-4 items-center'>
+        <div className='flex flex-col gap-4'>
           {Object.entries(autoEntrepreneurFieldsInfos).map(([key, label]) => (
-            <>
+            <div key={key} className='grid grid-cols-2 gap-4 items-center'>
               <Label htmlFor={key}>{label}</Label>
               {key === 'acre' ? (
                 <Switch
@@ -84,8 +86,9 @@ export default function InputForm() {
                       const formData = new FormData(formRef.current);
                       formData.set('from-input', 'acre');
                       calculateAction(formData);
+                      setPending(true);
                     }
-                    setAcre(!prevState);
+                    setAcre(prevState);
                   }}
                 />
               ) : (
@@ -98,7 +101,7 @@ export default function InputForm() {
                   defaultValue={0}
                 />
               )}
-            </>
+            </div>
           ))}
         </div>
       </div>

@@ -28,7 +28,7 @@ export default function RootLayout({
         )}
       >
         <header className='sticky top-0 z-50 bg-primary shadow-sm'>
-          <div className='container mx-auto py-4'>
+          <div className='flex p-4'>
             <h1 className='text-xl font-bold text-primary-foreground'>
               {metadata.title as string}
             </h1>

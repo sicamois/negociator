@@ -12,10 +12,7 @@ function setFormDataValue(
       formData.set(key, value);
       break;
     case 'number':
-      formData.set(
-        key,
-        value.toLocaleString(undefined, { maximumFractionDigits: 0 })
-      );
+      formData.set(key, value.toString());
       break;
     case 'undefined':
       break;
@@ -82,6 +79,20 @@ export async function calculate(
 
   if (coutPrestation === 0) {
     coutPrestation = salaireBrut;
+  }
+
+  switch (fromInput) {
+    case 'cout_prestation':
+      coutPrestation = baseValue;
+      break;
+    case 'revenu_net':
+      coutPrestation = baseValue / (0.78656 + (acre ? 0.106 : 0));
+      break;
+    case 'revenu_net_apres_impot':
+      coutPrestation = baseValue / (0.76956 + (acre ? 0.106 : 0));
+      break;
+    default:
+      break;
   }
 
   const aideAcre = acre ? 0.106 : 0;
