@@ -25,53 +25,48 @@ function setFormDataValue(
 }
 
 export async function calculate(
-  currentState: {
-    message: string;
-    formData: FormData;
-  },
-  formData: FormData
+  formData: FormData,
+  withAcre: boolean,
+  fromInput: string
 ) {
-  const fromInput = formData.get('from-input');
-
+  console.log('withAcre', withAcre);
   if (
-    typeof fromInput !== 'string' ||
-    !fromInput ||
-    (!salariesFields.includes(fromInput) &&
-      !autoEntrepreneurFields.includes(fromInput))
+    !salariesFields.includes(fromInput) &&
+    !autoEntrepreneurFields.includes(fromInput)
   ) {
-    return {
-      message: 'Aucune valeur à calculer',
-      formData: currentState.formData,
-    };
+    return formData;
   }
 
   const baseValue = parseInt((formData.get(fromInput) ?? '0').toString());
-  const acre = formData.get('acre') === 'on';
 
   let salaireBrut = parseInt((formData.get('salaire_brut') ?? '0').toString());
 
   switch (fromInput) {
     case 'cout_employeur':
-      salaireBrut = baseValue * 0.949;
+      salaireBrut = baseValue / 1.18765;
       break;
     case 'salaire_brut':
       salaireBrut = baseValue;
       break;
     case 'salaire_net':
-      salaireBrut = baseValue / 0.73;
+      salaireBrut = baseValue / 0.77577;
       break;
     case 'salaire_net_apres_impot':
-      salaireBrut = baseValue / 0.77;
+      salaireBrut = baseValue / 0.76342;
       break;
     default:
       break;
   }
 
   const newFormData = new FormData();
-  setFormDataValue(newFormData, 'cout_employeur', salaireBrut * 1.656);
+  setFormDataValue(newFormData, 'cout_employeur', salaireBrut * 1.18765);
   setFormDataValue(newFormData, 'salaire_brut', salaireBrut);
-  setFormDataValue(newFormData, 'salaire_net', salaireBrut * 0.952);
-  setFormDataValue(newFormData, 'salaire_net_apres_impot', salaireBrut * 0.895);
+  setFormDataValue(newFormData, 'salaire_net', salaireBrut * 0.77577);
+  setFormDataValue(
+    newFormData,
+    'salaire_net_apres_impot',
+    salaireBrut * 0.76342
+  );
 
   let coutPrestation = parseInt(
     (formData.get('cout_prestation') ?? '0').toString()
@@ -81,35 +76,31 @@ export async function calculate(
     coutPrestation = salaireBrut;
   }
 
+  const tauxAcre = withAcre ? 0.106 : 0;
   switch (fromInput) {
     case 'cout_prestation':
       coutPrestation = baseValue;
       break;
     case 'revenu_net':
-      coutPrestation = baseValue / (0.78656 + (acre ? 0.106 : 0));
+      coutPrestation = baseValue / (0.78656 + tauxAcre);
       break;
     case 'revenu_net_apres_impot':
-      coutPrestation = baseValue / (0.76956 + (acre ? 0.106 : 0));
+      coutPrestation = baseValue / (0.76956 + tauxAcre);
       break;
     default:
       break;
   }
-
-  const aideAcre = acre ? 0.106 : 0;
   setFormDataValue(newFormData, 'cout_prestation', coutPrestation);
   setFormDataValue(
     newFormData,
     'revenu_net',
-    coutPrestation * (0.78656 + aideAcre)
+    coutPrestation * (0.78656 + tauxAcre)
   );
   setFormDataValue(
     newFormData,
     'revenu_net_apres_impot',
-    coutPrestation * (0.76956 + aideAcre)
+    coutPrestation * (0.76956 + tauxAcre)
   );
 
-  return {
-    message: 'Calcul effectué',
-    formData: newFormData,
-  };
+  return newFormData;
 }

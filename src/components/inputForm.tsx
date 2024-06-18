@@ -1,50 +1,43 @@
 'use client';
 
-import { useActionState, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useTransition } from 'react';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Switch } from './ui/switch';
 import { calculate } from '@/app/actions';
-import { useFormStatus } from 'react-dom';
 import { salariesFieldsInfos, autoEntrepreneurFieldsInfos } from '@/app/fields';
-import { toast } from 'sonner';
-
-const initialState = {
-  message: '',
-  formData: new FormData(),
-};
 
 export default function InputForm() {
   const formRef = useRef<HTMLFormElement>(null);
-  const [formState, calculateAction] = useActionState(calculate, initialState);
-  const [pending, setPending] = useState(false);
+  const [isPending, startTransition] = useTransition();
   const [acre, setAcre] = useState<boolean>(true);
-
-  function handleInputChange(event: React.ChangeEvent<HTMLInputElement>) {
-    if (formRef.current) {
-      setPending(true);
-      const formData = new FormData(formRef.current);
-      formData.set('from-input', event.target.name);
-      calculateAction(formData);
-    }
-  }
+  const [formData, setFormData] = useState<FormData>(new FormData());
 
   useEffect(() => {
     if (formRef.current) {
       for (const element of formRef.current.getElementsByTagName('input')) {
         if (element instanceof HTMLInputElement) {
-          const value = formState.formData.get(element.id);
+          const value = formData.get(element.id);
           if (typeof value === 'string') {
             element.value = parseInt(value).toString();
           }
         }
       }
     }
-    if (formState.message !== '') {
-      toast(formState.message);
-    }
-    setPending(false);
-  }, [formState]);
+  }, [formData]);
+
+  function calculateAction(fieldname: string, withAcre = acre) {
+    startTransition(async () => {
+      if (formRef.current) {
+        const newFormData = await calculate(
+          new FormData(formRef.current),
+          withAcre,
+          fieldname
+        );
+        setFormData(newFormData);
+      }
+    });
+  }
 
   return (
     <form
@@ -61,8 +54,8 @@ export default function InputForm() {
                 id={key}
                 name={key}
                 type='number'
-                onBlur={handleInputChange}
-                disabled={pending}
+                onBlur={() => calculateAction(key)}
+                disabled={isPending}
                 defaultValue={0}
               />
             </div>
@@ -77,19 +70,12 @@ export default function InputForm() {
               <Label htmlFor={key}>{label}</Label>
               {key === 'acre' ? (
                 <Switch
-                  id={key}
                   name={key}
-                  disabled={pending}
+                  disabled={isPending}
                   checked={acre}
                   onCheckedChange={(newState) => {
-                    if (formRef.current) {
-                      setAcre(newState);
-                      const formData = new FormData(formRef.current);
-                      formData.set('from-input', 'acre');
-                      formData.set('acre', newState ? 'on' : 'off');
-                      calculateAction(formData);
-                      setPending(true);
-                    }
+                    setAcre(newState);
+                    calculateAction(key, newState);
                   }}
                 />
               ) : (
@@ -97,8 +83,8 @@ export default function InputForm() {
                   id={key}
                   name={key}
                   type='number'
-                  onBlur={handleInputChange}
-                  disabled={pending}
+                  onBlur={() => calculateAction(key)}
+                  disabled={isPending}
                   defaultValue={0}
                 />
               )}
