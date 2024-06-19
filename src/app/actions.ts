@@ -40,7 +40,9 @@ export async function calculate(formData: FormData, fromInput: string) {
 
   const newFormData = new FormData();
 
-  const engine = new Engine(rules);
+  const engine = new Engine(rules, {
+    logger: { log: (_) => {}, warn: (_) => {}, error: console.error },
+  });
   const baseSituation: Record<string, any> = {
     'salarié . contrat': "'CDD'",
     'salarié . contrat . CDD . durée': 1,
@@ -127,7 +129,6 @@ export async function calculate(formData: FormData, fromInput: string) {
   );
 
   // Auto-entrepreneur
-  const contratEngine = new Engine(rules);
   const autoentrepreneurSituation = {
     'entreprise . catégorie juridique': "'EI'",
     'entreprise . catégorie juridique . EI . auto-entrepreneur': 'oui',
@@ -141,27 +142,27 @@ export async function calculate(formData: FormData, fromInput: string) {
 
   switch (fromInput) {
     case 'cout_prestation':
-      contratEngine.setSituation({
+      engine.setSituation({
         ...autoentrepreneurSituation,
         "dirigeant . auto-entrepreneur . chiffre d'affaires":
           value * hourlyMultiplier,
       });
       break;
     case 'revenu_net':
-      contratEngine.setSituation({
+      engine.setSituation({
         ...autoentrepreneurSituation,
         'dirigeant . auto-entrepreneur . revenu net': value * hourlyMultiplier,
       });
       break;
     case 'revenu_net_apres_impot':
-      contratEngine.setSituation({
+      engine.setSituation({
         ...autoentrepreneurSituation,
         'dirigeant . auto-entrepreneur . revenu net . après impôt':
           value * hourlyMultiplier,
       });
       break;
     default:
-      contratEngine.setSituation({
+      engine.setSituation({
         ...autoentrepreneurSituation,
         "dirigeant . auto-entrepreneur . chiffre d'affaires":
           getFormDataValue(formData, 'cout_prestation') > 0
@@ -175,22 +176,20 @@ export async function calculate(formData: FormData, fromInput: string) {
   setFormDataValue(
     newFormData,
     'cout_prestation',
-    (contratEngine.evaluate(
-      "dirigeant . auto-entrepreneur . chiffre d'affaires"
-    ).nodeValue as number) / hourlyMultiplier
+    (engine.evaluate("dirigeant . auto-entrepreneur . chiffre d'affaires")
+      .nodeValue as number) / hourlyMultiplier
   );
   setFormDataValue(
     newFormData,
     'revenu_net',
-    (contratEngine.evaluate('dirigeant . auto-entrepreneur . revenu net')
+    (engine.evaluate('dirigeant . auto-entrepreneur . revenu net')
       .nodeValue as number) / hourlyMultiplier
   );
   setFormDataValue(
     newFormData,
     'revenu_net_apres_impot',
-    (contratEngine.evaluate(
-      'dirigeant . auto-entrepreneur . revenu net . après impôt'
-    ).nodeValue as number) / hourlyMultiplier
+    (engine.evaluate('dirigeant . auto-entrepreneur . revenu net . après impôt')
+      .nodeValue as number) / hourlyMultiplier
   );
 
   return newFormData;

@@ -18,7 +18,9 @@ export default function InputForm() {
         if (element instanceof HTMLInputElement) {
           const value = formData.get(element.id);
           if (typeof value === 'string') {
-            element.value = parseInt(value).toString();
+            element.value = parseFloat(value).toLocaleString(undefined, {
+              maximumFractionDigits: 0,
+            });
           }
         }
       }
