@@ -76,7 +76,7 @@ export default function InputForm() {
         </div>
       </div>
       <div className='flex flex-col gap-4 sm:gap-8'>
-        <div className='flex gap-4 justify-start'>
+        <div className='flex gap-4 items-center'>
           <h2 className='text-xl text-primary font-bold'>Auto-entrepreneur</h2>
           {isPending ? <Spinner className='m-0' /> : null}
         </div>
