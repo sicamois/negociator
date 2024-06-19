@@ -46,7 +46,7 @@ export default function InputForm() {
       <div className='flex flex-col gap-4 sm:gap-8'>
         <div className='flex gap-4 items-center'>
           <h2 className='text-xl text-primary font-bold'>Employé</h2>
-          {isPending ? <Spinner className='m-0' /> : null}
+          {isPending ? <Spinner className='mx-0' /> : null}
         </div>
         <div className='flex flex-col gap-4'>
           {Object.entries(salariesFieldsInfos).map(([key, label]) => (
@@ -76,7 +76,7 @@ export default function InputForm() {
       <div className='flex flex-col gap-4 sm:gap-8'>
         <div className='flex gap-4 items-center'>
           <h2 className='text-xl text-primary font-bold'>Auto-entrepreneur</h2>
-          {isPending ? <Spinner className='m-0' /> : null}
+          {isPending ? <Spinner className='mx-0' /> : null}
         </div>
         <div className='flex flex-col gap-4'>
           {Object.entries(autoEntrepreneurFieldsInfos).map(
