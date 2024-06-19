@@ -17,11 +17,9 @@ export default function InputForm() {
     if (formRef.current) {
       for (const element of formRef.current.getElementsByTagName('input')) {
         if (element instanceof HTMLInputElement) {
-          const value = formData.get(element.id);
+          const value = formData.get(element.name);
           if (typeof value === 'string') {
-            element.value = parseFloat(value).toLocaleString(undefined, {
-              maximumFractionDigits: 0,
-            });
+            element.value = Math.round(Number(value)).toString();
           }
         }
       }
