@@ -48,7 +48,7 @@ export default function InputForm() {
         <h2 className='text-xl text-primary font-bold'>Employé</h2>
         <div className='flex flex-col gap-4'>
           {Object.entries(salariesFieldsInfos).map(([key, label]) => (
-            <div key={key} className='grid grid-cols-2 gap-4 items-center'>
+            <div key={key} className='h-10 grid grid-cols-2 gap-4 items-center'>
               <Label htmlFor={key}>{label}</Label>
               <Input
                 id={key}
@@ -66,7 +66,7 @@ export default function InputForm() {
         <h2 className='text-xl text-primary font-bold'>Auto-entrepreneur</h2>
         <div className='flex flex-col gap-4'>
           {Object.entries(autoEntrepreneurFieldsInfos).map(([key, label]) => (
-            <div key={key} className='grid grid-cols-2 gap-4 items-center'>
+            <div key={key} className='h-10 grid grid-cols-2 gap-4 items-center'>
               <Label htmlFor={key}>{label}</Label>
               {key === 'acre' ? (
                 <Switch
