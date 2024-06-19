@@ -26,17 +26,20 @@ function setFormDataValue(
   }
 }
 
-export async function calculate(
-  formData: FormData,
-  withAcre: boolean,
-  fromInput: string
-) {
+function getFormDataValue(formData: FormData, key: string) {
+  return parseInt((formData.get(key) ?? '0').toString());
+}
+
+export async function calculate(formData: FormData, fromInput: string) {
   if (
     !salariesFields.includes(fromInput) &&
     !autoEntrepreneurFields.includes(fromInput)
   ) {
     return formData;
   }
+
+  const newFormData = new FormData();
+
   const engine = new Engine(rules);
   const baseSituation: Record<string, any> = {
     'salarié . contrat': "'CDD'",
@@ -56,7 +59,7 @@ export async function calculate(
     dirigeant: 'non',
   };
 
-  const value = parseInt((formData.get(fromInput) ?? '0').toString());
+  const value = getFormDataValue(formData, fromInput);
   const hourlyMultiplier =
     value < 100
       ? (engine.evaluate('salarié . contrat . temps de travail')
@@ -94,14 +97,10 @@ export async function calculate(
       engine.setSituation({
         ...baseSituation,
         'salarié . coût total employeur':
-          parseInt((formData.get('cout_employeur') ?? '0').toString()) *
-          12 *
-          hourlyMultiplier,
+          getFormDataValue(formData, 'cout_employeur') * 12 * hourlyMultiplier,
       });
       break;
   }
-
-  const newFormData = new FormData();
   setFormDataValue(
     newFormData,
     'cout_employeur',
@@ -134,7 +133,7 @@ export async function calculate(
     'entreprise . catégorie juridique . EI . auto-entrepreneur': 'oui',
     'entreprise . activités . service ou vente': "'service'",
     'entreprise . date de création': '01/07/2023',
-    'dirigeant . exonérations . ACRE': withAcre ? 'oui' : 'non',
+    'dirigeant . exonérations . ACRE': "'oui'",
     'établissement . commune . département': "'Paris'",
     'entreprise . activité . nature': "'commerciale'",
     'dirigeant . auto-entrepreneur . impôt . versement libératoire': 'oui',
@@ -162,14 +161,14 @@ export async function calculate(
       });
       break;
     default:
-      if (parseInt((formData.get('cout_prestation') ?? '0').toString()) === 0) {
-        contratEngine.setSituation({
-          ...autoentrepreneurSituation,
-          "dirigeant . auto-entrepreneur . chiffre d'affaires": engine.evaluate(
-            'salarié . coût total employeur'
-          ).nodeValue as number,
-        });
-      }
+      contratEngine.setSituation({
+        ...autoentrepreneurSituation,
+        "dirigeant . auto-entrepreneur . chiffre d'affaires":
+          getFormDataValue(formData, 'cout_prestation') > 0
+            ? getFormDataValue(formData, 'cout_prestation') * hourlyMultiplier
+            : (engine.evaluate('salarié . coût total employeur')
+                .nodeValue as number),
+      });
       break;
   }
 

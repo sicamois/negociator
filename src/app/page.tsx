@@ -8,6 +8,10 @@ export default function Home() {
           Négociez mieux avec votre client
         </h1>
         <InputForm />
+        <p className='font-light text-center w-full p-4'>
+          Les simulations sont faites avec un taux d&apos;imposition de 10% et
+          en appliquant l&apos;ACRE
+        </p>
       </main>
     </div>
   );

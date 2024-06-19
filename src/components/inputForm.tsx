@@ -3,14 +3,13 @@
 import { useEffect, useRef, useState, useTransition } from 'react';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
-import { Switch } from './ui/switch';
 import { calculate } from '@/app/actions';
 import { salariesFieldsInfos, autoEntrepreneurFieldsInfos } from '@/app/fields';
+import { cn } from '@/lib/utils';
 
 export default function InputForm() {
   const formRef = useRef<HTMLFormElement>(null);
   const [isPending, startTransition] = useTransition();
-  const [acre, setAcre] = useState<boolean>(true);
   const [formData, setFormData] = useState<FormData>(new FormData());
 
   useEffect(() => {
@@ -26,12 +25,11 @@ export default function InputForm() {
     }
   }, [formData]);
 
-  function calculateAction(fieldname: string, withAcre = acre) {
+  function calculateAction(fieldname: string) {
     startTransition(async () => {
       if (formRef.current) {
         const newFormData = await calculate(
           new FormData(formRef.current),
-          withAcre,
           fieldname
         );
         setFormData(newFormData);
@@ -65,20 +63,16 @@ export default function InputForm() {
       <div className='flex flex-col gap-4 sm:gap-8'>
         <h2 className='text-xl text-primary font-bold'>Auto-entrepreneur</h2>
         <div className='flex flex-col gap-4'>
-          {Object.entries(autoEntrepreneurFieldsInfos).map(([key, label]) => (
-            <div key={key} className='h-10 grid grid-cols-2 gap-4 items-center'>
-              <Label htmlFor={key}>{label}</Label>
-              {key === 'acre' ? (
-                <Switch
-                  name={key}
-                  disabled={isPending}
-                  checked={acre}
-                  onCheckedChange={(newState) => {
-                    setAcre(newState);
-                    calculateAction(key, newState);
-                  }}
-                />
-              ) : (
+          {Object.entries(autoEntrepreneurFieldsInfos).map(
+            ([key, label], index) => (
+              <div
+                key={key}
+                className={cn(
+                  'h-10 grid grid-cols-2 gap-4 items-center',
+                  index === 0 ? 'sm:mb-14' : ''
+                )}
+              >
+                <Label htmlFor={key}>{label}</Label>
                 <Input
                   id={key}
                   name={key}
@@ -87,9 +81,9 @@ export default function InputForm() {
                   disabled={isPending}
                   defaultValue={0}
                 />
-              )}
-            </div>
-          ))}
+              </div>
+            )
+          )}
         </div>
       </div>
     </form>

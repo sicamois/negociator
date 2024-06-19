@@ -7,7 +7,6 @@ export const salariesFieldsInfos = {
 
 export const autoEntrepreneurFieldsInfos = {
   cout_prestation: 'Coût prestation',
-  acre: 'Déduire ACRE ?',
   revenu_net: 'Revenu net',
   revenu_net_apres_impot: 'Revenu net après impôt',
 };
